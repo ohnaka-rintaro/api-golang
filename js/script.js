@@ -7,3 +7,7 @@ function displayTitle() {
     h1Title.appendChild(titleText);
 }
 displayTitle();
+
+(function () {
+    console.log('即時関数のテスト');
+}());
