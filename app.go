@@ -4,19 +4,18 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"text/template"
 
 	"github.com/ant0ine/go-json-rest/rest"
 )
 
-// htmlを表示するために必要
-var tpl *template.Template
-
-func init() {
-	tpl = template.Must(template.ParseFiles("index.html"))
-}
-
 func main() {
+	// HTMLページを表示
+	// http.Handle("/", http.FileServer(http.Dir("static")))
+	// if err := http.ListenAndServe(":8080", nil); err != nil {
+	// 	log.Fatal("ListenAndServe: ", err)
+	// }
+
+	// API起動
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
