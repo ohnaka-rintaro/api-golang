@@ -3,12 +3,29 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"sync"
+	"text/template"
 
 	"github.com/ant0ine/go-json-rest/rest"
 )
 
+// htmlを表示するために必要
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseFiles("index.html"))
+}
+
 func main() {
+	var age = 235
+
+	// htmlに表示するために必要
+	err := tpl.Execute(os.Stdout, age)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
