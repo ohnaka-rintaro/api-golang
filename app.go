@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"sync"
 	"text/template"
 
@@ -18,14 +17,6 @@ func init() {
 }
 
 func main() {
-	var age = 235
-
-	// htmlに表示するために必要
-	err := tpl.Execute(os.Stdout, age)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
