@@ -6,14 +6,14 @@ import (
 	"sync"
 
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/sqs/goreturns/returns"
 )
 
 func main() {
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
-		rest.Post("/countries", PostCountry)
+		rest.Post("/countries", PostCountry),
+		rest.Get("/countries/:code", GetCountry),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -22,16 +22,19 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", api.MakeHandler()))
 }
 
+// Country 国codeと名前
 type Country struct {
 	Code string
 	Name string
 }
 
+// ここに一時的にPOSTされたデータを保存しているんだな
 var store = map[string]*Country{}
 
 // これ何？
 var lock = sync.RWMutex{}
 
+// PostCountry 国を投稿する
 func PostCountry(w rest.ResponseWriter, r *rest.Request) {
 	country := Country{}
 	err := r.DecodeJsonPayload(&country)
@@ -52,4 +55,23 @@ func PostCountry(w rest.ResponseWriter, r *rest.Request) {
 	store[country.Code] = &country
 	lock.Unlock()
 	w.WriteJson(&country)
+}
+
+// GetCountry 国々を取得する
+func GetCountry(w rest.ResponseWriter, r *rest.Request) {
+	code := r.PathParam("code")
+
+	lock.RLock()
+	var country *Country
+	if store[code] != nil {
+		country = &Country{}
+		*country = *store[code]
+	}
+	lock.RUnlock()
+
+	if country == nil {
+		rest.NotFound(w, r)
+		return
+	}
+	w.WriteJson(country)
 }
